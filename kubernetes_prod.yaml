@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssslite-prod
+spec:
+  selector:
+    matchLabels:
+      app: ssslite
+      variant: prod
+  template:
+    metadata:
+      labels:
+        app: ssslite
+        variant: prod
+    spec:
+      containers:
+        - name: ssslite-prod
+          image: ghcr.io/dbca-wa/ssslite
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '5m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          startupProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmpfs-ram
+      volumes:
+        - name: tmpfs-ram
+          emptyDir:
+            medium: 'Memory'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssslite-clusterip-prod
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+  selector:
+    app: ssslite
+    variant: prod
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ssslite-ingress-prod
+spec:
+  rules:
+    - host: ssslite.dbca.wa.gov.au
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ssslite-clusterip-prod
+                port:
+                  number: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ssslite-hpa-prod
+spec:
+  minReplicas: 2
+  maxReplicas: 5
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ssslite-prod
+  metrics:
+    - resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 500
+      type: Resource
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ssslite-pdb-prod
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: ssslite
+      variant: prod
