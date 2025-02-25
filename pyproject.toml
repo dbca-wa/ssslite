@@ -1,6 +1,6 @@
 [project]
 name = "ssslite"
-version = "0.1.0"
+version = "1.0.0"
 description = "Lightweight embeddable HTML spatial data pages for DBCA"
 authors = [{ name = "Ashley Felton", email = "ashley.felton@dbca.wa.gov.au" }]
 license = "Apache-2.0"
