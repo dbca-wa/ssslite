@@ -32,6 +32,11 @@ def serve_static(filepath):
     return static_file(filepath, root=os.path.join(PROJECT_DIR, "static"))
 
 
+@application.error(404)
+def error404(error):
+    return "Not found"
+
+
 if __name__ == "__main__":
     from bottle import run
 
