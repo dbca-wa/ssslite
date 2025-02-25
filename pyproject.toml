@@ -1,0 +1,19 @@
+[project]
+name = "ssslite"
+version = "0.1.0"
+description = "Lightweight embeddable HTML spatial data pages for DBCA"
+authors = [{ name = "Ashley Felton", email = "ashley.felton@dbca.wa.gov.au" }]
+license = "Apache-2.0"
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = ["bottle==0.13.2", "gunicorn==23.0.0"]
+
+[dependency-groups]
+dev = ["ipython>=8.32.0"]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+ignore = ["E265", "E501", "E722"]
