@@ -6,7 +6,7 @@ const ibpLayer = L.tileLayer(
 );
 
 const map = L.map('map', {
-  center: [-26.5, 121.5],
+  center: [-24, 121],
   zoom: 5,
   minZoom: 4,
   maxZoom: 18,
