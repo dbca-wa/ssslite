@@ -67,6 +67,7 @@ spec:
         - name: tmpfs-ram
           emptyDir:
             medium: 'Memory'
+      automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Service

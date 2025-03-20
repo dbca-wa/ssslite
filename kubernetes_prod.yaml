@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ssslite-prod
-          image: ghcr.io/dbca-wa/ssslite
+          image: ghcr.io/dbca-wa/ssslite:1.0.0
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -67,6 +67,7 @@ spec:
         - name: tmpfs-ram
           emptyDir:
             medium: 'Memory'
+      automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Service
