@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Prepare the base environment.
-FROM python:3.12-slim-bookworm AS builder_base
+FROM python:3.12-slim-bookworm AS builder_base_ssslite
 
 # This approximately follows this guide: https://hynek.me/articles/docker-uv/
 # Which creates a standalone environment with the dependencies.
@@ -31,28 +31,25 @@ RUN --mount=type=cache,target=/root/.cache \
 
 ##################################################################################
 
-FROM python:3.12-slim-bookworm
+FROM python:3.12-alpine
 LABEL org.opencontainers.image.authors=asi@dbca.wa.gov.au
 LABEL org.opencontainers.image.source=https://github.com/dbca-wa/ssslite
 
-# Install OS packages
-# RUN apt-get update -y \
-#   && apt-get upgrade -y \
-#   && apt-get install -y gdal-bin proj-bin libmagic-dev \
-#   && rm -rf /var/lib/apt/lists/*
+# Install system updates
+RUN apk upgrade --no-cache
 
-# Create a non-root user.
-RUN groupadd -r -g 1000 app \
-  && useradd -r -u 1000 -d /app -g app -N app
+# Create a non-root user to run the application.
+RUN addgroup -g 1000 app \
+  && adduser -H -D -u 1000 -G app app
 
-COPY --from=builder_base --chown=app:app /app /app
+# Install the project.
+WORKDIR /app
+COPY --from=builder_base_ssslite --chown=app:app /app /app
 # Make sure we use the virtualenv by default
 ENV PATH="/app/.venv/bin:$PATH"
 # Run Python unbuffered
 ENV PYTHONUNBUFFERED=1
 
-# Install the project.
-WORKDIR /app
 COPY gunicorn.py ibp.html index.html pyproject.toml ssslite.py ./
 COPY static ./static
 USER app
