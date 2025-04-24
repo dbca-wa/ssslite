@@ -6,7 +6,7 @@ const todaysBurnsLayer = L.tileLayer(
 );
 
 const map = L.map('map', {
-  center: [-24, 121],
+  center: [-24, 131],
   zoom: 5,
   minZoom: 4,
   maxZoom: 18,
