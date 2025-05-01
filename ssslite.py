@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from bottle import Bottle, static_file
+from bottle import Bottle, redirect, static_file
 
 application = Bottle()
 PROJECT_DIR = str(Path(__file__).resolve().parents[0])
@@ -9,12 +9,13 @@ PROJECT_DIR = str(Path(__file__).resolve().parents[0])
 
 @application.route("/")
 def index():
-    return static_file("index.html", root=PROJECT_DIR)
+    # Redirect the root location to Today's Burns.
+    return redirect("todaysburns")
 
 
 @application.route("/todaysburns")
 def todaysburns():
-    return static_file("index.html", root=PROJECT_DIR)
+    return static_file("todaysburns.html", root=PROJECT_DIR)
 
 
 @application.route("/ibp")
