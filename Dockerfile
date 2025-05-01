@@ -50,7 +50,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Run Python unbuffered
 ENV PYTHONUNBUFFERED=1
 
-COPY gunicorn.py ibp.html index.html pyproject.toml ssslite.py ./
+COPY gunicorn.py ibp.html todaysburns.html pyproject.toml ssslite.py ./
 COPY static ./static
 USER app
 EXPOSE 8080
