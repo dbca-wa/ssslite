@@ -24,16 +24,28 @@ function setBurnStyle(feature, layer) {
       <td>${feature.properties.burn_id}</td>
     </tr>
     <tr>
-      <th>Status:</th>
-      <td>${feature.properties.burn_stat}</td>
-    </tr>
-    <tr>
       <th>Updated on:</th>
       <td>${feature.properties.burn_target_date}</td>
     </tr>
     <tr>
+      <th>Status:</th>
+      <td>${feature.properties.burn_stat}</td>
+    </tr>
+    <tr>
+      <th>Location:</th>
+      <td>${feature.properties.location}</td>
+    </tr>
+    <tr>
+      <th>Purpose:</th>
+      <td>${feature.properties.burn_purpose}</td>
+    </tr>
+    <tr>
       <th>Indicative area (ha):</th>
       <td>${Number(feature.properties.indicative_area).toFixed(0)}</td>
+    </tr>
+    <tr>
+      <th>Estimated start:</th>
+      <td>${feature.properties.burn_est_start}</td>
     </tr>
     <tr>
       <th>Planned area today (ha):</th>
