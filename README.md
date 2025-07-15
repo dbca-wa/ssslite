@@ -27,3 +27,4 @@ Manage new or updated project dependencies with uv also, like so:
 To build a new Docker image from the `Dockerfile`:
 
     docker image build -t ghcr.io/dbca-wa/ssslite .
+    docker container run --rm --publish 8080:8080 ghcr.io/dbca-wa/ssslite
