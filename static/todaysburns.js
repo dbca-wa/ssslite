@@ -2,7 +2,7 @@
 
 const openStreetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
 const todaysBurnsLayer = L.tileLayer(
-  'https://kmi.dbca.wa.gov.au/geoserver/public/gwc/service/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=mercator&tilematrix=mercator:{z}&tilecol={x}&tilerow={y}&format=image/png&layer=public:todays_burns&style=public:todays_burns_ShowPinpoint'
+  'https://kb.dbca.wa.gov.au/geoserver/gwc/service/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=mercator&tilematrix=mercator:{z}&tilecol={x}&tilerow={y}&format=image/png&layer=kaartdijin-boodja-public:todays_burns'
 );
 
 const map = L.map('map', {
@@ -72,7 +72,7 @@ function loadTodaysBurnsDetails(burnsDetailsLayer) {
   burnsDetailsLayer.clearLayers();
   // Query the WFS endpoint for burns details.
   const todaysBurnsWFS =
-    'https://kmi.dbca.wa.gov.au/geoserver/public/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=public%3Atodays_burns&outputFormat=application%2Fjson';
+    'https://kb.dbca.wa.gov.au/geoserver/kaartdijin-boodja-public/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kaartdijin-boodja-public:todays_burns&outputFormat=application/json';
   fetch(todaysBurnsWFS)
     // Parse the response as JSON.
     .then((resp) => resp.json())

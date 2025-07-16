@@ -1,8 +1,15 @@
+import json
 import os
 from pathlib import Path
 
-from bottle import Bottle, redirect, static_file
+import requests
+from bottle import Bottle, redirect, request, response, static_file
 
+dot_env = os.path.join(os.getcwd(), ".env")
+if os.path.exists(dot_env):
+    from dotenv import load_dotenv
+
+    load_dotenv()
 application = Bottle()
 PROJECT_DIR = str(Path(__file__).resolve().parents[0])
 
@@ -21,6 +28,34 @@ def todaysburns():
 @application.route("/ibp")
 def ibp():
     return static_file("ibp.html", root=PROJECT_DIR)
+
+
+@application.route("/query-slip/ibp")
+def query_slip_ibp():
+    """Query the SLIP MapServer endpoint for any feature intersecting the x,y query params passed in via the request."""
+    url = f"{os.getenv('SLIP_URL_IBP')}/query"
+    auth = (os.getenv("SLIP_USERNAME"), os.getenv("SLIP_PASSWORD"))
+    x = request.query.x
+    y = request.query.y
+    params = {
+        "f": "geojson",
+        "outFields": "*",
+        "returnGeometry": True,
+        "geometry": f"{x},{y}",
+        "geometryType": "esriGeometryPoint",
+        "spatialRel": "esriSpatialRelIntersects",
+    }
+    resp = requests.get(url, auth=auth, params=params)
+    resp.raise_for_status()
+    data = resp.json()
+    response.content_type = "application/json"
+    if "features" in data and len(data["features"]) > 0:
+        # Remove surrounding double-quotes from purpose field.
+        for feature in data["features"]:
+            feature["properties"]["purpose"] = feature["properties"]["purpose"].replace('"', "")
+        return json.dumps(data)
+    else:
+        return "{}"
 
 
 @application.route("/favicon.ico")

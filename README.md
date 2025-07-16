@@ -22,6 +22,10 @@ Manage new or updated project dependencies with uv also, like so:
 
     uv add newpackage==1.0
 
+Run the application locally like so:
+
+    python ssslite.py
+
 ## Docker image
 
 To build a new Docker image from the `Dockerfile`:
