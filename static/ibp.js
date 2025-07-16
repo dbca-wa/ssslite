@@ -2,7 +2,11 @@
 
 const openStreetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
 const ibpLayer = L.tileLayer(
-  'https://kb.dbca.wa.gov.au/geoserver/gwc/service/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=mercator&tilematrix=mercator:{z}&tilecol={x}&tilerow={y}&format=image/png&layer=kaartdijin-boodja-public:dbca_annual_indicative_burn_program_dbca-007_public'
+  'https://kb.dbca.wa.gov.au/geoserver/gwc/service/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=mercator&tilematrix=mercator:{z}&tilecol={x}&tilerow={y}&format=image/png&layer=kaartdijin-boodja-public:dbca_annual_indicative_burn_program_dbca-007_public',
+  {
+    transparent: true,
+    opacity: 0.75,
+  }
 );
 
 const map = L.map('map', {
