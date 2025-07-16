@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssslite-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: ssslite
+          env:
+            - name: SLIP_URL_IBP
+              valueFrom:
+                secretKeyRef:
+                  name: ssslite-env-uat
+                  key: SLIP_URL_IBP
+            - name: SLIP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ssslite-env-uat
+                  key: SLIP_USERNAME
+            - name: SLIP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ssslite-env-uat
+                  key: SLIP_PASSWORD
