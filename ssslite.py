@@ -68,6 +68,12 @@ def serve_static(filepath):
     return static_file(filepath, root=os.path.join(PROJECT_DIR, "static"))
 
 
+@application.route("/livez")
+@application.route("/readyz")
+def liveness():
+    return "OK"
+
+
 @application.error(404)
 def error404(error):
     return "Not found"

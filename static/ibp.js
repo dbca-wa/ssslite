@@ -14,55 +14,18 @@ const map = L.map('map', {
   attributionControl: false,
 });
 
-// Function to set the popup for each burn feature added to the layer.
-function setBurnStyle(feature, layer) {
-  layer.bindPopup(`
-<table class="table table-bordered table-striped table-sm">
-  <tbody>
-    <tr>
-      <th>Burn ID:</th>
-      <td>${feature.properties.burnid}</td>
-    </tr>
-    <tr>
-      <th>Region:</th>
-      <td>${feature.properties.region}</td>
-    </tr>
-    <tr>
-      <th>District:</th>
-      <td>${feature.properties.district}</td>
-    </tr>
-    <tr>
-      <th>Location:</th>
-      <td>${feature.properties.location}</td>
-    </tr>
-    <tr>
-      <th>Purpose:</th>
-      <td>${feature.properties.purpose}</td>
-    </tr>
-    <tr>
-      <th>Area (ha):</th>
-      <td>${Number(feature.properties.area_ha).toFixed(0)}</td>
-    </tr>
-    <tr>
-      <th>Perimeter (km):</th>
-      <td>${Number(feature.properties.perim_km).toFixed(0)}</td>
-    </tr>
-  </tbody>
-</table>
-  `);
-}
-
-// Click event for the map
+// Click event for the map.
 map.on('click', function (evt) {
   const [x, y] = [evt.latlng.lng, evt.latlng.lat];
   const queryUrl = `/query-slip/ibp?x=${x}&y=${y}`;
+  // Query the proxied URL for any feature intersecting the clicked-on location.
   fetch(queryUrl)
     .then((resp) => resp.json())
     .then(function (data) {
       if (Object.hasOwn(data, 'features')) {
         const feature = data.features[0];
-        const content = `
-<table class="table table-bordered table-striped table-sm">
+        // Popup content:
+        const content = `<table class="table table-bordered table-striped table-sm">
   <tbody>
     <tr>
       <th>Burn ID:</th>
@@ -94,7 +57,7 @@ map.on('click', function (evt) {
     </tr>
   </tbody>
 </table>`;
-        // Open a popup on the map.
+        // Open the popup on the map.
         L.popup().setLatLng(evt.latlng).setContent(content).openOn(map);
       }
     });
