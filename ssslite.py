@@ -14,13 +14,13 @@ application = Bottle()
 PROJECT_DIR = str(Path(__file__).resolve().parents[0])
 
 
-@application.route("/")
+@application.get("/")
 def index():
     # Redirect the root location to Today's Burns.
     return redirect("todaysburns")
 
 
-@application.route("/todaysburns")
+@application.get("/todaysburns")
 def todaysburns():
     """Return the Today's Burns spatial view. Browsers and proxies should avoid caching this response."""
     response = static_file("todaysburns.html", root=PROJECT_DIR)
@@ -28,13 +28,13 @@ def todaysburns():
     return response
 
 
-@application.route("/ibp")
+@application.get("/ibp")
 def ibp():
     """Return the Indicative Burn Planning view."""
     return static_file("ibp.html", root=PROJECT_DIR)
 
 
-@application.route("/query-slip/ibp")
+@application.get("/query-slip/ibp")
 def query_slip_ibp():
     """Query the SLIP MapServer endpoint for any feature intersecting the x,y query params passed in via the request."""
     url = f"{os.getenv('SLIP_URL_IBP')}/query"
@@ -63,18 +63,18 @@ def query_slip_ibp():
         return "{}"
 
 
-@application.route("/favicon.ico")
+@application.get("/favicon.ico")
 def favicon():
     return static_file("favicon.ico", root=os.path.join(PROJECT_DIR, "static"))
 
 
-@application.route("/static/<filepath:path>")
+@application.get("/static/<filepath:path>")
 def serve_static(filepath):
     return static_file(filepath, root=os.path.join(PROJECT_DIR, "static"))
 
 
-@application.route("/livez")
-@application.route("/readyz")
+@application.get("/livez")
+@application.get("/readyz")
 def liveness():
     return "OK"
 
@@ -82,6 +82,11 @@ def liveness():
 @application.error(404)
 def error404(error):
     return "Not found"
+
+
+@application.error(405)
+def error405(error):
+    return "Not allowed"
 
 
 if __name__ == "__main__":
