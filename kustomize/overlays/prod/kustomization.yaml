@@ -22,4 +22,4 @@ patches:
   - path: service_patch.yaml
 images:
   - name: ghcr.io/dbca-wa/ssslite
-    newTag: 1.0.4
+    newTag: 1.0.5
