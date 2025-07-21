@@ -22,11 +22,15 @@ def index():
 
 @application.route("/todaysburns")
 def todaysburns():
-    return static_file("todaysburns.html", root=PROJECT_DIR)
+    """Return the Today's Burns spatial view. Browsers and proxies should avoid caching this response."""
+    response = static_file("todaysburns.html", root=PROJECT_DIR)
+    response.set_header("Cache-Control", "no-store")  # Caches should not store this response to maintain currency.
+    return response
 
 
 @application.route("/ibp")
 def ibp():
+    """Return the Indicative Burn Planning view."""
     return static_file("ibp.html", root=PROJECT_DIR)
 
 
@@ -49,6 +53,7 @@ def query_slip_ibp():
     resp.raise_for_status()
     data = resp.json()
     response.content_type = "application/json"
+    response.set_header("Cache-Control", "no-store")  # Caches should avoid storing this response.
     if "features" in data and len(data["features"]) > 0:
         # Remove surrounding double-quotes from purpose field.
         for feature in data["features"]:
