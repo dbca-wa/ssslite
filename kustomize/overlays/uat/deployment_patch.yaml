@@ -23,3 +23,8 @@ spec:
                 secretKeyRef:
                   name: ssslite-env-uat
                   key: SLIP_PASSWORD
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot

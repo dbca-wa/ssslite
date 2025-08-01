@@ -7,6 +7,7 @@ spec:
     spec:
       containers:
         - name: ssslite
+          imagePullPolicy: IfNotPresent
           env:
             - name: SLIP_URL_IBP
               valueFrom:
