@@ -22,6 +22,12 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"
+      integrity="sha512-Q7HOppxoH0L2M7hreVoFCtUZimR2YaY0fBewIYzkCgmNtgOOZ5IgMNYxHgfps0qrO1ef5m7L1FeHrhXlq1I9HA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <style>
       html,
       body {
@@ -29,6 +35,21 @@
       }
       #map {
         height: 100%;
+      }
+      .leaflet-tooltip.burn-label {
+        background-color: transparent;
+        border: transparent;
+        box-shadow: none;
+        font-weight: bold;
+        font-size: 14px;
+        text-shadow:
+          0 0 5px grey,
+          0 0 10px lightgrey,
+          0 0 20px lightgrey,
+          0 0 30px white;
+      }
+      .leaflet-tooltip-right::before {
+        border-right-color: transparent;
       }
     </style>
   </head>

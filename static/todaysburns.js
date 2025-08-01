@@ -1,25 +1,22 @@
 'use strict';
 
 const openStreetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
-const todaysBurnsLayer = L.tileLayer(
-  'https://kb.dbca.wa.gov.au/geoserver/gwc/service/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=mercator&tilematrix=mercator:{z}&tilecol={x}&tilerow={y}&format=image/png&layer=kaartdijin-boodja-public:todays_burns',
-  {
-    transparent: true,
-    opacity: 0.75,
-  }
-);
 
 const map = L.map('map', {
   center: [-24, 120],
   zoom: 5,
   minZoom: 4,
   maxZoom: 17,
-  layers: [openStreetMap, todaysBurnsLayer],
+  layers: [openStreetMap],
   attributionControl: false,
 });
 
-// Function to set the popup for each burn feature added to the layer.
+// Function to set the style, label and popup for each burn feature added to the layer.
 function setBurnStyle(feature, layer) {
+  const centroid = turf.centroid(feature).geometry.coordinates;
+  new L.CircleMarker([centroid[1], centroid[0]], { stroke: false, fill: false })
+    .bindTooltip(feature.properties.burn_id, { permanent: true, direction: 'right', offset: [-10, 0], className: 'burn-label' })
+    .addTo(map);
   layer.bindPopup(`
 <table class="table table-bordered table-striped table-sm">
   <tbody>
@@ -64,9 +61,28 @@ function setBurnStyle(feature, layer) {
   `);
 }
 
-// Define the (initially) empty burns detail popup layer and add it to the map.
-const todaysBurnsDetailsLayer = L.geoJSON('', {
-  style: { opacity: 0 },
+// Define the (initially empty) Today's Burns layer and add it to the map.
+const todaysBurnsLayer = L.geoJSON('', {
+  // style: { opacity: 0 },
+  style: function (feature) {
+    let color = '#3388ff';
+    switch (feature.properties.burn_stat) {
+      case 'Planned - No Prior Ignitions':
+        color = '#ffaa00';
+        break;
+      case 'Active - Planned Ignitions Today':
+        color = '#e60000';
+        break;
+      case 'Active - No Planned Ignitions Today':
+        color = '#730000';
+        break;
+    }
+    return {
+      color: color,
+      opacity: 0.8,
+      fillOpacity: 0.4,
+    };
+  },
   onEachFeature: setBurnStyle,
 }).addTo(map);
 
@@ -86,5 +102,5 @@ function loadTodaysBurnsDetails(burnsDetailsLayer) {
       burnsDetailsLayer.addData(data);
     });
 }
-// Immediately run the function to populate the details layer.
-loadTodaysBurnsDetails(todaysBurnsDetailsLayer);
+// Immediately run the function to populate the burns layer.
+loadTodaysBurnsDetails(todaysBurnsLayer);
