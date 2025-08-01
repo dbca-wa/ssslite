@@ -63,7 +63,6 @@ function setBurnStyle(feature, layer) {
 
 // Define the (initially empty) Today's Burns layer and add it to the map.
 const todaysBurnsLayer = L.geoJSON('', {
-  // style: { opacity: 0 },
   style: function (feature) {
     let color = '#3388ff';
     switch (feature.properties.burn_stat) {
@@ -88,8 +87,6 @@ const todaysBurnsLayer = L.geoJSON('', {
 
 // Function to load burn details from the WFS endpoint.
 function loadTodaysBurnsDetails(burnsDetailsLayer) {
-  // Remove any existing data from the layer.
-  burnsDetailsLayer.clearLayers();
   // Query the WFS endpoint for burns details.
   const todaysBurnsWFS =
     'https://kb.dbca.wa.gov.au/geoserver/kaartdijin-boodja-public/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kaartdijin-boodja-public:todays_burns&outputFormat=application/json';
