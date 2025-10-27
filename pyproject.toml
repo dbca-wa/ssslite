@@ -1,6 +1,6 @@
 [project]
 name = "ssslite"
-version = "1.0.5"
+version = "1.0.6"
 description = "Lightweight embeddable HTML spatial data pages for DBCA"
 authors = [{ name = "Ashley Felton", email = "ashley.felton@dbca.wa.gov.au" }]
 license = "Apache-2.0"
@@ -9,12 +9,12 @@ requires-python = ">=3.13,<4.0"
 dependencies = [
   "bottle==0.13.4",
   "gunicorn==23.0.0",
-  "python-dotenv==1.1.1",
-  "requests==2.32.4",
+  "python-dotenv==1.2.1",
+  "requests==2.32.5",
 ]
 
 [dependency-groups]
-dev = ["ipython>=8.32.0"]
+dev = ["ipython>=9.6.0"]
 
 [tool.ruff]
 line-length = 120
