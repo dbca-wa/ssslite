@@ -12,10 +12,6 @@ secretGenerator:
       - .env
 generatorOptions:
   disableNameSuffixHash: true
-labels:
-  - includeSelectors: true
-    pairs:
-      variant: prod
 patches:
   - path: deployment_patch.yaml
   - path: deployment_hpa_patch.yaml

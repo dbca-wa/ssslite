@@ -6,4 +6,3 @@ spec:
   type: ClusterIP
   selector:
     app: ssslite-deployment
-    variant: prod
