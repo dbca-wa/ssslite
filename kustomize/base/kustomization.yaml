@@ -3,4 +3,8 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - deployment_hpa.yaml
+  - networkpolicy-egress-deny.yaml
+  - networkpolicy-egress.yaml
+  - networkpolicy-ingress-deny.yaml
+  - networkpolicy-ingress.yaml
   - service.yaml

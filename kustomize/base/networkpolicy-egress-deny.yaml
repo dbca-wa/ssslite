@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ssslite-networkpolicy-egress-deny
+spec:
+  # Match all pods in the namespace.
+  podSelector: {}
+  # Egress policy only.
+  policyTypes:
+    - Egress
+  # 'Deny all' where no further rules are defined.
+  egress: []
