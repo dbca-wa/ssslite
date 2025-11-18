@@ -1,36 +1,29 @@
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
-  name: ssslite-networkpolicy-egress-allow
+  name: ssslite-ciliumnetworkpolicy-egress-allow
 spec:
-  # Match deployment pods.
-  podSelector:
+  # Match all pods having the correct label
+  endpointSelector:
     matchLabels:
       app: ssslite-deployment
-  # Egress policy only.
-  policyTypes:
-    - Egress
   # Allow rules:
   egress:
-    # Allow access to cluster DNS.
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-    # Allow HTTPS & DNS requests to the internet.
-    - to:
-        - ipBlock:
-            cidr: '0.0.0.0/0'
-            # Exclude cluster-local IP ranges.
-            except:
-              - '10.0.0.0/8'
-              - '172.16.0.0/12'
-              - '192.168.0.0/16'
-      ports:
-        - port: 443
-          protocol: TCP
-        - port: 53
-          protocol: UDP
+    # Allow DNS lookups
+    - toEndpoints:
+        - matchLabels:
+            'k8s:io.kubernetes.pod.namespace': kube-system
+            'k8s:k8s-app': kube-dns
+      toPorts:
+        - ports:
+            - port: '53'
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: '*'
+    # Allow requests to required domains
+    # NOTE: matchPattern will not work for *.wa.gov.au
+    - toFQDNs:
+        - matchPattern: '*.slip.wa.gov.au'
+        - matchPattern: '*.dbca.wa.gov.au'
+        # - matchName: 'services.slip.wa.gov.au'
