@@ -7,19 +7,6 @@ spec:
     spec:
       containers:
         - name: ssslite
-          env:
-            - name: SLIP_URL_IBP
-              valueFrom:
-                secretKeyRef:
-                  name: ssslite-env-uat
-                  key: SLIP_URL_IBP
-            - name: SLIP_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: ssslite-env-uat
-                  key: SLIP_USERNAME
-            - name: SLIP_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ssslite-env-uat
-                  key: SLIP_PASSWORD
+          envFrom:
+            - secretRef:
+                name: ssslite-env-uat
