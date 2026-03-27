@@ -2,9 +2,12 @@
 
 bind = ":8080"
 workers = 2
-# Give workers an expiry:
+worker_connections = 1000  # Max connections per worker
 max_requests = 2048
 max_requests_jitter = 256
 preload_app = True
+keepalive = 5  # Keepalive timeout
+graceful_timeout = 30  # Graceful shutdown timeout
 # Disable access logging.
 accesslog = None
+control_socket = "/tmp/gunicorn.ctl"

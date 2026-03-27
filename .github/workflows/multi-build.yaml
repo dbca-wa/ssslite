@@ -218,7 +218,7 @@ jobs:
             network=host
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         # This step logs in to the GitHub Container Registry (GHCR) using the docker/login-action.
         # It uses the GitHub actor's username and the GITHUB_TOKEN secret for authentication.
         # The login is necessary to push the merged manifest list to GHCR.
@@ -226,6 +226,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hardened Images Registry
+        # This step logs into the Docker Hardened Images Registry in order to download the required images.
+        # It uses Actions secrets that must be set on the repository in GitHub.
+        uses: docker/login-action@v4
+        with:
+          registry: dhi.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Get execution timestamp with RFC3339 format
         # This step gets the current execution timestamp in RFC3339 format.
