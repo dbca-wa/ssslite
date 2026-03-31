@@ -10,7 +10,7 @@ dependencies = [
   "bottle==0.13.4",
   "gunicorn[fast]==25.3.0",
   "python-dotenv==1.2.2",
-  "requests==2.33.0",
+  "requests==2.33.1",
 ]
 
 [dependency-groups]
