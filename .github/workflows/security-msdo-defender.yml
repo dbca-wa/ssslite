@@ -1,0 +1,43 @@
+name: Security Scan (MSDO – Defender for Cloud)
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+
+jobs:
+  security-analysis:
+    # Ensure this only runs in the organisation repo
+    if: github.repository_owner == 'dbca-wa'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Run Microsoft Security DevOps (Defender mode)
+        uses: microsoft/security-devops-action@v1
+        with:
+          tools: bandit,credscan
+          categories: code,secrets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: .gdn/sarif/*.sarif
