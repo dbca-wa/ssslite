@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Run Microsoft Security DevOps (Defender mode)
+      - name: Run Microsoft Security DevOps (Defender for Cloud)
         uses: microsoft/security-devops-action@v1
         with:
           tools: bandit
@@ -37,7 +37,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: .gdn/sarif/*.sarif
+          sarif_file: ${{ env.MSDO_SARIF_FILE }}
