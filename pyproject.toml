@@ -8,13 +8,13 @@ readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
   "bottle==0.13.4",
-  "gunicorn[fast]==25.3.0",
+  "gunicorn[fast]==26.0.0",
   "python-dotenv==1.2.2",
-  "requests==2.33.0",
+  "requests==2.33.1",
 ]
 
 [dependency-groups]
-dev = ["ipython>=9.11.0"]
+dev = ["ipython>=9.13.0"]
 
 [tool.ruff]
 line-length = 120
