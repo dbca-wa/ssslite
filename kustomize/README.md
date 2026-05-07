@@ -86,6 +86,70 @@ All other outbound connections (including to other pods, the Kubernetes API, or 
 
 > **Note:** The egress deny uses a standard `NetworkPolicy` (applies to all pods), while the egress allow uses a `CiliumNetworkPolicy` scoped only to `ssslite-deployment` pods. Both overlays inherit these controls unchanged from the base.
 
+#### Network Diagram (prod overlay)
+
+```
+  Internet
+     │
+     │  HTTPS  ssslite.dbca.wa.gov.au
+     ▼
+┌─────────────────────────────────────────────┐
+│  Namespace: ingress-nginx                   │
+│                                             │
+│  ┌───────────────────────────────────────┐  │
+│  │  NGINX Ingress Controller             │  │
+│  │  (app.kubernetes.io/name: ingress-nginx) │
+│  └───────────────┬───────────────────────┘  │
+└──────────────────┼──────────────────────────┘
+                   │
+    ╔══════════════╪═══════════════════════════════════════════╗
+    ║  Namespace: sss (prod)                                   ║
+    ║                                                          ║
+    ║  NetworkPolicy: ingress-deny  ──── default deny (all pods)
+    ║  NetworkPolicy: ingress-allow ──── ALLOW TCP/8080 from ingress-nginx
+    ║                   │                                      ║
+    ║                   ▼                                      ║
+    ║  ┌────────────────────────────────────────────────────┐  ║
+    ║  │  Ingress: ssslite-ingress-prod                     │  ║
+    ║  │  ssslite.dbca.wa.gov.au → ssslite-clusterip-prod   │  ║
+    ║  └────────────────────┬───────────────────────────────┘  ║
+    ║                       │                                  ║
+    ║                       ▼                                  ║
+    ║  ┌────────────────────────────────────────────────────┐  ║
+    ║  │  Service: ssslite-clusterip-prod                   │  ║
+    ║  │  ClusterIP  TCP/8080                               │  ║
+    ║  └──────┬─────────────┬───────────────────────────────┘  ║
+    ║         │             │   HPA: ssslite-deployment-hpa-prod 
+    ║         │             │   (min 2 / max 5 replicas)       ║
+    ║         ▼             ▼                                  ║
+    ║  ┌────────────┐ ┌────────────┐                           ║
+    ║  │  Pod  [1]  │ │  Pod  [2]  │  ...up to 5               ║
+    ║  │  ssslite   │ │  ssslite   │  app: ssslite-deployment  ║
+    ║  │  :1.0.9    │ │  :1.0.9    │  port 8080                ║
+    ║  └─────┬──────┘ └─────┬──────┘                           ║
+    ║        │              │                                  ║
+    ║  NetworkPolicy: egress-deny  ── default deny (all pods)  ║
+    ║  CiliumNetworkPolicy: egress-allow  (ssslite pods only)  ║
+    ║        │                                                 ║
+    ║        ├─── ALLOW UDP+TCP/53 ─────────────────────────║─►║──┐
+    ║        │                                                 ║  │
+    ║        │         ┌──────────────────────────────────║─┐  ║  │
+    ║        │         │  Namespace: kube-system            │  ║  │
+    ║        └────────►│  kube-dns  (k8s-app: kube-dns)     │◄─║──┘
+    ║                  └──────────────────────────────────║─┘  ║
+    ║        │                                                 ║
+    ╚════════╪═════════════════════════════════════════════════╝
+             │
+             │  ALLOW HTTPS (Cilium FQDN)
+             │
+             ├──────────────────────────────────►  *.slip.wa.gov.au
+             │                                    (e.g. services.slip.wa.gov.au)
+             │
+             └──────────────────────────────────►  *.dbca.wa.gov.au
+
+    All other ingress/egress: BLOCKED
+```
+
 ### Key Differences: UAT vs Prod
 
 | Aspect | UAT | Prod |
