@@ -302,6 +302,7 @@ jobs:
             --arg run_id "${{ github.run_id }}" \
             --arg run_attempt "${{ github.run_attempt }}" \
             --arg server_url "${{ github.server_url }}" \
+            --arg started_on "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             '{
               buildDefinition: {
                 buildType: "https://actions.github.io/buildtypes/workflow/v1",
@@ -316,7 +317,8 @@ jobs:
                   github: {
                     event_name: $event_name,
                     repository_id: $repository_id,
-                    repository_owner_id: $repository_owner_id
+                    repository_owner_id: $repository_owner_id,
+                    runner_environment: "github-hosted"
                   }
                 },
                 resolvedDependencies: [
@@ -331,10 +333,12 @@ jobs:
                   id: ($server_url + "/" + $workflow_ref)
                 },
                 metadata: {
-                  invocationId: ($server_url + "/" + $repo + "/actions/runs/" + $run_id + "/attempts/" + $run_attempt)
+                  invocationId: ($server_url + "/" + $repo + "/actions/runs/" + $run_id + "/attempts/" + $run_attempt),
+                  startedOn: $started_on
                 }
               }
             }' > /tmp/provenance-predicate.json
+          echo "=== Generated predicate ===" && cat /tmp/provenance-predicate.json
 
       - name: Attest build provenance
         # This step generates a signed SLSA build provenance attestation for the merged multi-arch image
