@@ -284,6 +284,49 @@ jobs:
           echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
           docker buildx imagetools inspect '${{ env.GHCR_IMAGE }}:${{ steps.meta.outputs.version }}'
 
+      - name: Generate SLSA provenance predicate
+        # Constructs a valid SLSA provenance v1 predicate JSON that satisfies the GitHub Attestations
+        # API schema, which requires a non-nil buildDefinition with at least a buildType,
+        # externalParameters, and runDetails.builder.id / runDetails.metadata.invocationId.
+        id: predicate
+        run: |
+          jq -n \
+            --arg ref "${{ github.ref }}" \
+            --arg sha "${{ github.sha }}" \
+            --arg repo "${{ github.repository }}" \
+            --arg workflow "${{ github.workflow }}" \
+            --arg run_id "${{ github.run_id }}" \
+            --arg run_attempt "${{ github.run_attempt }}" \
+            --arg server_url "${{ github.server_url }}" \
+            '{
+              buildDefinition: {
+                buildType: "https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds",
+                externalParameters: {
+                  workflow: {
+                    ref: $ref,
+                    repository: ($server_url + "/" + $repo),
+                    path: ".github/workflows/multi-build.yaml"
+                  }
+                },
+                internalParameters: {
+                  github: {
+                    event_name: "push",
+                    sha: $sha,
+                    workflow: $workflow
+                  }
+                },
+                resolvedDependencies: []
+              },
+              runDetails: {
+                builder: {
+                  id: ($server_url + "/" + $repo + "/actions/runs/" + $run_id)
+                },
+                metadata: {
+                  invocationId: ($server_url + "/" + $repo + "/actions/runs/" + $run_id + "/attempts/" + $run_attempt)
+                }
+              }
+            }' > /tmp/provenance-predicate.json
+
       - name: Attest build provenance
         # This step generates a signed SLSA build provenance attestation for the merged multi-arch image
         # and pushes it to the registry alongside the image. The attestation cryptographically links
@@ -293,7 +336,7 @@ jobs:
           subject-name: ${{ env.GHCR_IMAGE }}
           subject-digest: ${{ steps.inspect.outputs.digest }}
           predicate-type: https://slsa.dev/provenance/v1
-          predicate: '{}'
+          predicate-path: /tmp/provenance-predicate.json
           push-to-registry: true
 
   scan:
