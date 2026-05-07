@@ -168,6 +168,7 @@ jobs:
     permissions:
       attestations: write
       actions: read
+      artifact-metadata: write
       checks: read
       contents: read
       deployments: none
