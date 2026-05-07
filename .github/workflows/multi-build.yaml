@@ -300,7 +300,7 @@ jobs:
             --arg server_url "${{ github.server_url }}" \
             '{
               buildDefinition: {
-                buildType: "https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds",
+                buildType: "https://slsa-framework.github.io/github-actions-buildtypes/workflow/v1",
                 externalParameters: {
                   workflow: {
                     ref: $ref,
