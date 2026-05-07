@@ -277,9 +277,24 @@ jobs:
         # This step inspects the created manifest list to verify its contents.
         # It uses the docker buildx imagetools inspect command to display information about the manifest list.
         # The inspection output will show the platforms and tags associated with the manifest list.
+        # The digest of the merged manifest is captured as an output for use in the attestation step.
         id: inspect
         run: |
+          DIGEST=$(docker buildx imagetools inspect '${{ env.GHCR_IMAGE }}:${{ steps.meta.outputs.version }}' --format '{{.Manifest.Digest}}')
+          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
           docker buildx imagetools inspect '${{ env.GHCR_IMAGE }}:${{ steps.meta.outputs.version }}'
+
+      - name: Attest build provenance
+        # This step generates a signed SLSA build provenance attestation for the merged multi-arch image
+        # and pushes it to the registry alongside the image. The attestation cryptographically links
+        # the image digest back to this workflow run, enabling consumers to verify the image's origin.
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
+        with:
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
+          predicate-type: https://slsa.dev/provenance/v1
+          predicate: '{}'
+          push-to-registry: true
 
   scan:
     # This job scans the merged Docker manifest produced in the previous job for security vulnerabilities
