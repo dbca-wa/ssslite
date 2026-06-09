@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["ipython>=9.14.0"]
+dev = ["ipython>=9.14.1"]
 
 [tool.ruff]
 line-length = 120
