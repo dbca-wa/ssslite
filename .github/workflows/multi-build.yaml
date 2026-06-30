@@ -345,7 +345,7 @@ jobs:
         # This step generates a signed SLSA build provenance attestation for the merged multi-arch image
         # and pushes it to the registry alongside the image. The attestation cryptographically links
         # the image digest back to this workflow run, enabling consumers to verify the image's origin.
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763 # v4
         with:
           subject-name: ${{ env.GHCR_IMAGE }}
           subject-digest: ${{ steps.inspect.outputs.digest }}
