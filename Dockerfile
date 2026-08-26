@@ -26,7 +26,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy the remaining project files to finish building the project
-COPY gunicorn.py ibp.html todaysburns.html pyproject.toml ssslite.py ./
+COPY gunicorn.py bait.html ibp.html todaysburns.html pyproject.toml ssslite.py ./
 COPY static ./static
 
 # Image runs as the nonroot user
