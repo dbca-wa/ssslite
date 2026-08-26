@@ -63,6 +63,12 @@ def query_slip_ibp():
         return "{}"
 
 
+@application.get("/bait")
+def ibp():
+    """Return the Western Shield Program permitted bait areas view."""
+    return static_file("bait.html", root=PROJECT_DIR)
+
+
 @application.get("/favicon.ico")
 def favicon():
     return static_file("favicon.ico", root=os.path.join(PROJECT_DIR, "static"))
