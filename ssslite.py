@@ -64,7 +64,7 @@ def query_slip_ibp():
 
 
 @application.get("/bait")
-def ibp():
+def bait():
     """Return the Western Shield Program permitted bait areas view."""
     return static_file("bait.html", root=PROJECT_DIR)
 
