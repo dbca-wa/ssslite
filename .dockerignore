@@ -1,0 +1,11 @@
+.git
+.gitignore
+.dockerignore
+Dockerfile*
+.env*
+**/__pycache__/
+*.pyc
+.venv
+kustomize
+logs
+staticfiles
