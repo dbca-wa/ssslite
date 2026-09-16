@@ -24,20 +24,40 @@
       html,
       body {
         height: 100%;
+        min-height: 100vh;
+      }
+      body {
+        margin: 0;
       }
       #map {
         height: 100%;
+        min-height: 320px;
+        width: 100%;
       }
         </style>
     </head>
     <body>
-        <div class="container-fluid p-0 d-flex h-100 flex-column">
+        <main class="container-fluid p-0 d-flex h-100 flex-column"
+              aria-label="Today's burns page">
             <div class="row m-0 p-0 flex-fill">
                 <div class="col m-0 p-0">
-                    <div id="map"></div>
+                    <section aria-labelledby="map-heading" class="h-100">
+                        <h1 id="map-heading" class="visually-hidden">Today's burns map</h1>
+                        <div id="map"
+                             tabindex="0"
+                             role="region"
+                             aria-label="Interactive map showing today's burns in Western Australia"
+                             aria-describedby="map-help"></div>
+                        <p id="map-help" class="visually-hidden">Use the map controls to pan and zoom. Screen reader users can use the map with the keyboard and read details in the pop-up information panels.</p>
+                    </section>
                 </div>
             </div>
-        </div>
+        </main>
+        <noscript>
+            <div class="alert alert-warning m-3" role="alert">
+                This map requires JavaScript to display current burn information.
+            </div>
+        </noscript>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js"
                 integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
                 crossorigin="anonymous"
