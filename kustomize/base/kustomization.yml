@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - deployment.yaml
-  - deployment_hpa.yaml
-  - networkpolicy-egress-deny.yaml
-  - networkpolicy-egress.yaml
-  - networkpolicy-ingress-deny.yaml
-  - networkpolicy-ingress.yaml
-  - service.yaml
+  - webserver.yml
+  - webserver_hpa.yml
+  - networkpolicy-egress-deny.yml
+  - networkpolicy-egress.yml
+  - networkpolicy-ingress-deny.yml
+  - networkpolicy-ingress.yml
+  - service.yml

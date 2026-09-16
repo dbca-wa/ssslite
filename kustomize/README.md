@@ -25,9 +25,9 @@ kubectl apply -k kustomize/overlays/uat --namespace sss --dry-run=client
 
 | Kind | Base Name | Description |
 |------|-----------|-------------|
-| `Deployment` | `ssslite-deployment` | Single container (`ghcr.io/dbca-wa/ssslite`), non-root, read-only FS, `/tmp` tmpfs, probes on `/livez` & `/readyz` port 8080, prefers ARM64 nodes, anti-affinity spread |
-| `HorizontalPodAutoscaler` | `ssslite-deployment-hpa` | min 2 / max 5 replicas, CPU utilization target 500% |
-| `Service` | `ssslite-clusterip` | ClusterIP on port 8080 |
+| `Deployment` | `ssslite-webserver` | Single container (`ghcr.io/dbca-wa/ssslite`), non-root, read-only FS, `/tmp` tmpfs, probes on `/livez` & `/readyz` port 8080, prefers ARM64 nodes, anti-affinity spread |
+| `HorizontalPodAutoscaler` | `ssslite-webserver-hpa` | min 2 / max 5 replicas, CPU utilization target 500% |
+| `Service` | `ssslite-webserver` | ClusterIP on port 8080 |
 | `NetworkPolicy` | `ssslite-networkpolicy-egress-deny` | Default-deny all egress for all pods |
 | `CiliumNetworkPolicy` | `ssslite-ciliumnetworkpolicy-egress-allow` | Allows DNS (kube-dns) + egress to `*.slip.wa.gov.au` and `*.dbca.wa.gov.au` |
 | `NetworkPolicy` | `ssslite-networkpolicy-ingress-deny` | Default-deny all ingress for all pods |
@@ -40,10 +40,10 @@ All resource names gain the `-uat` suffix. Additional/modified resources:
 | Kind | Name | Notes |
 |------|------|-------|
 | `Secret` | `ssslite-env-uat` | Generated from `.env` (SLIP URL, username, password) |
-| `Ingress` | `ssslite-ingress-uat` | nginx class, host: `ssslite-uat.dbca.wa.gov.au` → `ssslite-clusterip-uat:8080` |
+| `Ingress` | `ssslite-ingress-uat` | nginx class, host: `ssslite-uat.dbca.wa.gov.au` → `ssslite-webserver-uat:8080` |
 | `PodDisruptionBudget` | `ssslite-pdb-uat` | `minAvailable: 1` |
 | Deployment patch | — | Injects `ssslite-env-uat` secret as `envFrom`; `imagePullPolicy: Always` (base default) |
-| HPA patch | — | `scaleTargetRef.name: ssslite-deployment-uat` |
+| HPA patch | — | `scaleTargetRef.name: ssslite-webserver-uat` |
 | Image | — | No tag pin — uses whatever is in the base image reference |
 
 ### Prod Overlay (`nameSuffix: -prod`)
@@ -51,10 +51,10 @@ All resource names gain the `-uat` suffix. Additional/modified resources:
 | Kind | Name | Notes |
 |------|------|-------|
 | `Secret` | `ssslite-env-prod` | Generated from `.env` (SLIP URL, username, password) |
-| `Ingress` | `ssslite-ingress-prod` | nginx class, host: `ssslite.dbca.wa.gov.au` → `ssslite-clusterip-prod:8080` |
+| `Ingress` | `ssslite-ingress-prod` | nginx class, host: `ssslite.dbca.wa.gov.au` → `ssslite-webserver-prod:8080` |
 | `PodDisruptionBudget` | `ssslite-pdb-prod` | `minAvailable: 1` |
 | Deployment patch | — | Injects `ssslite-env-prod` secret as `envFrom`; `imagePullPolicy: IfNotPresent` |
-| HPA patch | — | `scaleTargetRef.name: ssslite-deployment-prod` |
+| HPA patch | — | `scaleTargetRef.name: ssslite-webserver-prod` |
 | Image | — | Pinned to tag `1.0.9` (`ghcr.io/dbca-wa/ssslite:1.0.9`) |
 
 ### Network Controls
@@ -75,7 +75,7 @@ Only traffic arriving via the NGINX ingress controller is permitted into the app
 | Resource | Kind | Effect |
 |----------|------|--------|
 | `ssslite-networkpolicy-egress-deny` | `NetworkPolicy` | Selects **all pods** in the namespace; denies all outbound traffic by default |
-| `ssslite-ciliumnetworkpolicy-egress-allow` | `CiliumNetworkPolicy` | Selects pods with label `app: ssslite-deployment`; allows the two rules below |
+| `ssslite-ciliumnetworkpolicy-egress-allow` | `CiliumNetworkPolicy` | Selects pods with label `app: ssslite-webserver`; allows the two rules below |
 
 Allowed egress from application pods:
 
@@ -84,7 +84,7 @@ Allowed egress from application pods:
 
 All other outbound connections (including to other pods, the Kubernetes API, or arbitrary internet destinations) are blocked.
 
-> **Note:** The egress deny uses a standard `NetworkPolicy` (applies to all pods), while the egress allow uses a `CiliumNetworkPolicy` scoped only to `ssslite-deployment` pods. Both overlays inherit these controls unchanged from the base.
+> **Note:** The egress deny uses a standard `NetworkPolicy` (applies to all pods), while the egress allow uses a `CiliumNetworkPolicy` scoped only to `ssslite-webserver` pods. Both overlays inherit these controls unchanged from the base.
 
 #### Network Diagram (prod overlay)
 
@@ -111,20 +111,20 @@ All other outbound connections (including to other pods, the Kubernetes API, or 
     ║                   ▼                                      ║
     ║  ┌────────────────────────────────────────────────────┐  ║
     ║  │  Ingress: ssslite-ingress-prod                     │  ║
-    ║  │  ssslite.dbca.wa.gov.au → ssslite-clusterip-prod   │  ║
+    ║  │  ssslite.dbca.wa.gov.au → ssslite-webserver-prod   │  ║
     ║  └────────────────────┬───────────────────────────────┘  ║
     ║                       │                                  ║
     ║                       ▼                                  ║
     ║  ┌────────────────────────────────────────────────────┐  ║
-    ║  │  Service: ssslite-clusterip-prod                   │  ║
+    ║  │  Service: ssslite-webserver-prod                   │  ║
     ║  │  ClusterIP  TCP/8080                               │  ║
     ║  └──────┬─────────────┬───────────────────────────────┘  ║
-    ║         │             │   HPA: ssslite-deployment-hpa-prod 
+    ║         │             │   HPA: ssslite-webserver-hpa-prod 
     ║         │             │   (min 2 / max 5 replicas)       ║
     ║         ▼             ▼                                  ║
     ║  ┌────────────┐ ┌────────────┐                           ║
     ║  │  Pod  [1]  │ │  Pod  [2]  │  ...up to 5               ║
-    ║  │  ssslite   │ │  ssslite   │  app: ssslite-deployment  ║
+    ║  │  ssslite   │ │  ssslite   │  app: ssslite-webserver  ║
     ║  │  :1.0.9    │ │  :1.0.9    │  port 8080                ║
     ║  └─────┬──────┘ └─────┬──────┘                           ║
     ║        │              │                                  ║

@@ -1,7 +1,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ssslite-deployment-hpa
+  name: ssslite-webserver-hpa
 spec:
   scaleTargetRef:
-    name: ssslite-deployment-prod
+    name: ssslite-webserver-prod

@@ -6,7 +6,7 @@ spec:
   # Match all pods having the correct label
   endpointSelector:
     matchLabels:
-      app: ssslite-deployment
+      app: ssslite-webserver
   # Allow rules:
   egress:
     # Allow DNS lookups
