@@ -69,6 +69,11 @@ def bait():
     return static_file("bait.html", root=PROJECT_DIR)
 
 
+@application.get("/test")
+def test():
+    return static_file("test.html", root=PROJECT_DIR)
+
+
 @application.get("/favicon.ico")
 def favicon():
     return static_file("favicon.ico", root=os.path.join(PROJECT_DIR, "static"))
