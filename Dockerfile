@@ -32,7 +32,7 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 # Copy the remaining project files to finish building the project
-COPY --chown=nonroot:nonroot gunicorn.py bait.html ibp.html todaysburns.html pyproject.toml ssslite.py ./
+COPY --chown=nonroot:nonroot gunicorn.py bait.html ibp.html test.html todaysburns.html pyproject.toml ssslite.py ./
 COPY --chown=nonroot:nonroot static ./static
 
 # Image runs as the nonroot user
