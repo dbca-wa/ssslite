@@ -47,6 +47,12 @@ COPY --link --chown=65532:65532 --from=builder /app/.venv /app/.venv
 COPY --link --chown=65532:65532 gunicorn.py bait.html ibp.html todaysburns.html ssslite.py ./
 COPY --link --chown=65532:65532 static ./static
 
+# Console scripts live in the venv, not on the base image's PATH: without this,
+# CMD ["gunicorn", ...] fails with "executable file not found in $PATH".
+ENV PATH="/app/.venv/bin:$PATH" \
+  PYTHONUNBUFFERED=1 \
+  PYTHONDONTWRITEBYTECODE=1
+
 # Image runs as the nonroot user
 USER nonroot
 EXPOSE 8080
